@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
   double dt = 1.0/30; // Time step
 
   Eigen::MatrixXd A(n, n); // State transition matrix
+  Eigen::MatrixXd B(n, n); // Control matrix
   Eigen::MatrixXd H(m, n); // Observation matrix
   Eigen::MatrixXd Q(n, n); // Process noise covariance
   Eigen::MatrixXd R(m, m); // Measurement noise covariance
@@ -31,6 +32,13 @@ int main(int argc, char* argv[]) {
 	   0, 0, 0, 1, 0, 0,
 	   0, 0, 0, 0, 1,dt,
 	   0, 0, 0, 0, 0, 1;
+
+  B << 1, 0, 0, 0, 0, 0,
+	   0, 0, 0, 0, 0, 0,
+	   0, 0, 0, 0, 0, 0,
+	   0, 0, 0, 0, 0, 0,
+	   0, 0, 0, 0, 0, 0,
+	   0, 0, 0, 0, 0, 0;
 
   H << 1, 0, 0, 0, 0, 0,
 	   0, 1, 0, 0, 0, 0,
@@ -68,7 +76,7 @@ int main(int argc, char* argv[]) {
   std::cout << "P: \n" << P << "\n" << std::endl;*/
 
   // Construct the filter
-  KalmanFilter kf(dt, A, H, Q, R, P);
+  KalmanFilter kf(dt, A, B, H, Q, R, P);
 
   // List of noisy position measurements (y)
   std::vector<double> measurements = {
@@ -88,10 +96,14 @@ int main(int argc, char* argv[]) {
   x0 << 0, 0, 0, 0, 0, 0;
   kf.init(t0, x0);
 
+  // Test control vector
+  Eigen::VectorXd u(n);
+  u << 5, 0, 0, 0, 0, 0;
+
   // Test measurement
   Eigen::VectorXd testMeasurement(n);
   testMeasurement << 1, 0, 1, 0, 0, 0.01;
-  kf.update(testMeasurement);
+  kf.update(testMeasurement, u);
 
   // Print new state
   std::cout << kf.state() << std::endl;
