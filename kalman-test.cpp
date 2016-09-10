@@ -13,35 +13,62 @@
 
 int main(int argc, char* argv[]) {
 
-  int n = 3; // Number of states
-  int m = 1; // Number of measurements
+  int n = 6; // Number of states
+  int m = 6; // Number of measurements
 
-  double t0 = 0; //Initial time
+  double t0 = 0;      // Initial time
   double dt = 1.0/30; // Time step
 
-  Eigen::MatrixXd A(n, n); // System dynamics matrix
-  Eigen::MatrixXd C(m, n); // Output matrix
+  Eigen::MatrixXd A(n, n); // State transition matrix
+  Eigen::MatrixXd H(m, n); // Observation matrix
   Eigen::MatrixXd Q(n, n); // Process noise covariance
   Eigen::MatrixXd R(m, m); // Measurement noise covariance
   Eigen::MatrixXd P(n, n); // Estimate error covariance
 
-  // Discrete LTI projectile motion, measuring position only
-  A << 1, dt, 0, 0, 1, dt, 0, 0, 1;
-  C << 1, 0, 0;
+  A << 1,dt, 0, 0, 0, 0,
+	   0, 1, 0, 0, 0, 0,
+	   0, 0, 1,dt, 0, 0,
+	   0, 0, 0, 1, 0, 0,
+	   0, 0, 0, 0, 1,dt,
+	   0, 0, 0, 0, 0, 1;
 
-  // Reasonable covariance matrices
-  Q << .05, .05, .0, .05, .05, .0, .0, .0, .0;
-  R << 5;
-  P << .1, .1, .1, .1, 10000, 10, .1, 10, 100;
+  H << 1, 0, 0, 0, 0, 0,
+	   0, 1, 0, 0, 0, 0,
+	   0, 0, 1, 0, 0, 0,
+	   0, 0, 0, 1, 0, 0,
+	   0, 0, 0, 0, 1, 0,
+	   0, 0, 0, 0, 0, 1;
 
-  std::cout << "A: \n" << A << "\n" << std::endl;
+  double q_val = 0.05;
+  Q << q_val, q_val,    .0,    .0,    .0,    .0,
+	    .0,   q_val,    .0,    .0,    .0,    .0,
+	    .0,    .0,   q_val, q_val,    .0,    .0,
+		.0,    .0,      .0, q_val,    .0,    .0,
+		.0,    .0,      .0,    .0, q_val, q_val,
+		.0,    .0,      .0,    .0,    .0, q_val;
+
+  R << .2, .0, .0, .0, .0, .0,
+	   .0, .2, .0, .0, .0, .0,
+	   .0, .0, .2, .0, .0, .0,
+	   .0, .0, .0, .2, .0, .0,
+	   .0, .0, .0, .0, .2, .0,
+	   .0, .0, .0, .0, .0, .2;
+
+  P << 1, 0, 0, 0, 0, 0,
+	   0, 1, 0, 0, 0, 0,
+	   0, 0, 1, 0, 0, 0,
+	   0, 0, 0, 1, 0, 0,
+	   0, 0, 0, 0, 1, 0,
+	   0, 0, 0, 0, 0, 1;
+
+  /*std::cout << "A: \n" << A << "\n" << std::endl;
   std::cout << "C: \n" << C << "\n" << std::endl;
   std::cout << "Q: \n" << Q << "\n" << std::endl;
   std::cout << "R: \n" << R << "\n" << std::endl;
-  std::cout << "P: \n" << P << "\n" << std::endl;
+  std::cout << "P: \n" << P << "\n" << std::endl;*/
 
   // Construct the filter
-  KalmanFilter kf(dt, A, C, Q, R, P);
+  KalmanFilter kf(dt, A, H, Q, R, P);
 
   // List of noisy position measurements (y)
   std::vector<double> measurements = {
@@ -56,22 +83,33 @@ int main(int argc, char* argv[]) {
       0.562381751596, 0.355468474885, -0.155607486619, -0.287198661013, -0.602973173813
   };
 
-  // Best guess of initial states
+  // Initial state should be at home, facing foward, not moving
   Eigen::VectorXd x0(n);
-  x0 << measurements[0], 0, -9.81;
+  x0 << 0, 0, 0, 0, 0, 0;
   kf.init(t0, x0);
 
-  // Feed measurements into filter, output estimated states
-  double t = 0;
-  Eigen::VectorXd y(m);
-  std::cout << "t = " << t << ", " << "x_hat[0]: " << kf.state().transpose() << std::endl;
-  for(int i = 0; i < measurements.size(); i++) {
-    t += dt;
-    y << measurements[i];
-    kf.update(y);
-    std::cout << "t = " << t << ", " << "y[" << i << "] = " << y.transpose()
-        << ", x_hat[" << i << "] = " << kf.state().transpose() << std::endl;
-  }
+  // Test measurement
+  Eigen::VectorXd testMeasurement(n);
+  testMeasurement << 1, 0, 1, 0, 0, 0.01;
+  kf.update(testMeasurement);
+
+  // Print new state
+  std::cout << kf.state() << std::endl;
+
+  //// Feed measurements into filter, output estimated states
+  //double t = 0;
+  //Eigen::VectorXd y(m);
+
+  //std::cout << "Time,Measurement,Estimation\n" << std::endl;
+  ////std::cout << "t = " << t << ", " << "x_hat[0]: " << kf.state().transpose() << std::endl;
+  //
+  //for(int i = 0; i < measurements.size(); i++)
+  //{
+  //  t += dt;
+  //  y << measurements[i];
+  //  kf.update(y);
+  //  std::cout << t << "," << y.transpose() << "," << kf.state()[0] << "," << kf.state()[1] << "," << kf.state()[2] << std::endl;
+  //}
 
   return 0;
 }
