@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <vector>
-#include <Eigen/Dense>
+#include <D:\Documents\C++_Programs\eigen\Eigen\Dense>
 
 #include "kalman.hpp"
 
@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
   int n = 3; // Number of states
   int m = 1; // Number of measurements
 
+  double t0 = 0; //Initial time
   double dt = 1.0/30; // Time step
 
   Eigen::MatrixXd A(n, n); // System dynamics matrix
@@ -33,14 +34,14 @@ int main(int argc, char* argv[]) {
   R << 5;
   P << .1, .1, .1, .1, 10000, 10, .1, 10, 100;
 
-  std::cout << "A: \n" << A << std::endl;
-  std::cout << "C: \n" << C << std::endl;
-  std::cout << "Q: \n" << Q << std::endl;
-  std::cout << "R: \n" << R << std::endl;
-  std::cout << "P: \n" << P << std::endl;
+  std::cout << "A: \n" << A << "\n" << std::endl;
+  std::cout << "C: \n" << C << "\n" << std::endl;
+  std::cout << "Q: \n" << Q << "\n" << std::endl;
+  std::cout << "R: \n" << R << "\n" << std::endl;
+  std::cout << "P: \n" << P << "\n" << std::endl;
 
   // Construct the filter
-  KalmanFilter kf(A, C, Q, R, P);
+  KalmanFilter kf(dt, A, C, Q, R, P);
 
   // List of noisy position measurements (y)
   std::vector<double> measurements = {
@@ -58,7 +59,7 @@ int main(int argc, char* argv[]) {
   // Best guess of initial states
   Eigen::VectorXd x0(n);
   x0 << measurements[0], 0, -9.81;
-  kf.init(x0);
+  kf.init(t0, x0);
 
   // Feed measurements into filter, output estimated states
   double t = 0;

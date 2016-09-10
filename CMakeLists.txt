@@ -3,7 +3,7 @@ project(kalman)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(EIGEN_INC_DIR /usr/include/eigen3/)
+set(EIGEN_INC_DIR eigen)
 include_directories(${EIGEN_INC_DIR})
 
 set(SOURCE_FILES kalman.cpp kalman-test.cpp)
