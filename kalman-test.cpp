@@ -11,6 +11,17 @@
 
 #include "kalman.hpp"
 
+int measurementStep = 0;
+
+Eigen::VectorXd generateMeasurements()
+{
+	Eigen::VectorXd m(6);
+
+	m << measurementStep++, measurementStep > 20 ? 2.0 : 1.0, 0.0, 0.0, 0.0, 0.0;
+
+	return m;
+}
+
 int main(int argc, char* argv[]) {
 
   int n = 6; // Number of states
@@ -33,8 +44,8 @@ int main(int argc, char* argv[]) {
 	   0, 0, 0, 0, 1,dt,
 	   0, 0, 0, 0, 0, 1;
 
-  B << 1, 0, 0, 0, 0, 0,
-	   0, 0, 0, 0, 0, 0,
+  B << 0, dt, 0, 0, 0, 0,
+	   0, 1, 0, 0, 0, 0,
 	   0, 0, 0, 0, 0, 0,
 	   0, 0, 0, 0, 0, 0,
 	   0, 0, 0, 0, 0, 0,
@@ -78,7 +89,7 @@ int main(int argc, char* argv[]) {
   // Construct the filter
   KalmanFilter kf(dt, A, B, H, Q, R, P);
 
-  // List of noisy position measurements (y)
+  // List of noisy position measurements (z)
   std::vector<double> measurements = {
       1.04202710058, 1.10726790452, 1.2913511148, 1.48485250951, 1.72825901034,
       1.74216489744, 2.11672039768, 2.14529225112, 2.16029641405, 2.21269371128,
@@ -98,15 +109,20 @@ int main(int argc, char* argv[]) {
 
   // Test control vector
   Eigen::VectorXd u(n);
-  u << 5, 0, 0, 0, 0, 0;
+  u << 0, 1, 0, 0, 0, 0;
 
   // Test measurement
   Eigen::VectorXd testMeasurement(n);
   testMeasurement << 1, 0, 1, 0, 0, 0.01;
-  kf.update(testMeasurement, u);
+  //kf.update(testMeasurement, u);
+  for (int i = 0; i < measurements.size(); i++)
+  {
+	  measurementStep > 20 ? kf.update(generateMeasurements(), u) : kf.update(generateMeasurements());
+	  std::cout << kf.state()[0] << "," << kf.state()[1] << std::endl;
+  }
 
   // Print new state
-  std::cout << kf.state() << std::endl;
+  //std::cout << kf.state() << std::endl;
 
   //// Feed measurements into filter, output estimated states
   //double t = 0;

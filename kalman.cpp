@@ -32,6 +32,7 @@ void KalmanFilter::init(double t0, const Eigen::VectorXd& x0) {
   P = P0;
   this->t0 = t0;
   t = t0;
+  u = u.Zero(B.cols());
   initialized = true;
 }
 
@@ -43,7 +44,7 @@ void KalmanFilter::init() {
   initialized = true;
 }
 
-void KalmanFilter::update(const Eigen::VectorXd& y) {
+void KalmanFilter::update(const Eigen::VectorXd& z) {
 
   if(!initialized)
     throw std::runtime_error("Filter is not initialized!");
@@ -51,23 +52,23 @@ void KalmanFilter::update(const Eigen::VectorXd& y) {
   x_hat_new = A * x_hat + B * u;
   P = A*P*A.transpose() + Q;
   K = P*H.transpose()*(H*P*H.transpose() + R).inverse();
-  x_hat_new += K * (y - H*x_hat_new);
+  x_hat_new += K * (z - H*x_hat_new);
   P = (I - K*H)*P;
   x_hat = x_hat_new;
 
   t += dt;
 }
 
-void KalmanFilter::update(const Eigen::VectorXd& y, const Eigen::VectorXd& u)
+void KalmanFilter::update(const Eigen::VectorXd& z, const Eigen::VectorXd& u)
 {
 	this->u = u;
-	update(y);
+	update(z);
 
 }
 
-void KalmanFilter::update(const Eigen::VectorXd& y, double dt, const Eigen::MatrixXd A) {
+void KalmanFilter::update(const Eigen::VectorXd& z, double dt, const Eigen::MatrixXd A) {
 
   this->A = A;
   this->dt = dt;
-  update(y);
+  update(z);
 }
