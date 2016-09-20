@@ -12,10 +12,9 @@
 
 #pragma once
 
-class KalmanFilter {
-
+class KalmanFilter
+{
 public:
-
   /**
   * Create a Kalman filter with the specified matrices.
   *   A - System dynamics matrix
@@ -70,11 +69,9 @@ public:
   /**
   * Return the current state and time.
   */
-  Eigen::VectorXd state() { return x_hat; };
-  double time() { return t; };
-
+  const Eigen::VectorXd& state() const { return x_hat; };
+  const double time() const { return t; };
 private:
-
   // Matrices for computation
   Eigen::MatrixXd A, B, H, Q, R, P, K, P0;
 
