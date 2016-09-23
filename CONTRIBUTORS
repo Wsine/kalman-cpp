@@ -1,0 +1,8 @@
+Kalman filter based on:
+  An Introduction to the Kalman Filter <http://www.cs.unc.edu/~welch/media/pdf/kalman_intro.pdf>
+
+Base Kalman filter code:
+  Hayk Martirosyan <hayk.mart@gmail.com>
+
+Control vector implementation:
+  Ryan Benasutti <firey45@gmail.com>
