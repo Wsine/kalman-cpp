@@ -10,13 +10,13 @@ KalmanFilter::KalmanFilter(
   const Eigen::MatrixXd& H,
   const Eigen::MatrixXd& Q,
   const Eigen::MatrixXd& R,
-  const Eigen::MatrixXd& P)
-  : A(A), B(B), H(H), Q(Q), R(R), P0(P),
-    m(H.rows()), n(A.rows()), dt(dt), initialized(false),
-    I(n, n), x_hat(n), x_hat_new(n), u(n)
-    {
-      I.setIdentity();
-    }
+  const Eigen::MatrixXd& P):
+  A(A), B(B), H(H), Q(Q), R(R), P0(P),
+  m(H.rows()), n(A.rows()), dt(dt), initialized(false),
+  I(n, n), x_hat(n), x_hat_new(n), u(n)
+{
+  I.setIdentity();
+}
 
 void KalmanFilter::init()
 {

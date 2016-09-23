@@ -82,27 +82,27 @@ public:
    */
   const double time() const { return t; }
 private:
-  //Matrices for computation
+  // Matrices for computation
   Eigen::MatrixXd A, B, H, Q, R, P, K, P0;
 
-  //System dimensions
+  // System dimensions
   int m, n;
 
-  //Initial and current time
+  // Initial and current time
   double t0, t;
 
-  //Time step
+  // Time step
   double dt;
 
-  //Is the filter initialized?
+  // Is the filter initialized?
   bool initialized;
 
-  //n-size identity
+  // n-size identity
   Eigen::MatrixXd I;
 
-  //Estimated states
+  // Estimated states
   Eigen::VectorXd x_hat, x_hat_new;
 
-  //Control vector
+  // Control vector
   Eigen::VectorXd u;
 };
