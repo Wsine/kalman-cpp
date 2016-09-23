@@ -5,6 +5,5 @@ before_install:
   - sudo apt-get install libeigen3-dev -y
 
 script:
-  - cd build
-  - cmake ..
+  - cmake .
   - make
