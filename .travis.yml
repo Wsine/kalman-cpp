@@ -2,8 +2,14 @@ language: cpp
 compiler: gcc
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install libeigen3-dev -y
+
+install:
+  - hg clone https://bitbucket.org/eigen/eigen/ /tmp/eigen && mkdir /tmp/eigen-build && cd /tmp/eigen-build && cmake . /tmp/eigen && make && sudo make install;
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
 
 script:
-  - cmake .
   - make
