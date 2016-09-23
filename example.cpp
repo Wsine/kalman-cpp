@@ -1,13 +1,6 @@
-/**
- * Test for the KalmanFilter class with 1D projectile motion.
- *
- * @author: Hayk Martirosyan
- * @date: 2014.11.15
- */
-
 #include <iostream>
 #include <vector>
-#include <D:\Documents\C++_Programs\eigen\Eigen\Dense>
+#include <Eigen\Dense>
 
 #include "kalman.hpp"
 

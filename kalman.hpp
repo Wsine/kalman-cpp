@@ -6,27 +6,27 @@ class KalmanFilter
 {
 public:
   /**
-  * Create a Kalman filter with the specified matrices.
-  *   A - System dynamics matrix
-  *   C - Output matrix
-  *   Q - Process noise covariance
-  *   R - Measurement noise covariance
-  *   P - Estimate error covariance
+  * Constructor.
+  *
+  * @param dt Time step
+  * @param A State transition matrix
+  * @param B Control matrix
+  * @param H Observation matrix
+  * @param Q Process noise covariance
+  * @param R Measurement noise covariance
+  * @param P Estimate error covariance
+  *
+  * @return Ready KalmanFilter
   */
   KalmanFilter(
-      double dt,
-      const Eigen::MatrixXd& A,
-	  const Eigen::MatrixXd& B,
-      const Eigen::MatrixXd& H,
-      const Eigen::MatrixXd& Q,
-      const Eigen::MatrixXd& R,
-      const Eigen::MatrixXd& P
+    double dt,
+    const Eigen::MatrixXd& A,
+    const Eigen::MatrixXd& B,
+    const Eigen::MatrixXd& H,
+    const Eigen::MatrixXd& Q,
+    const Eigen::MatrixXd& R,
+    const Eigen::MatrixXd& P
   );
-
-  /**
-  * Create a blank estimator.
-  */
-  KalmanFilter();
 
   /**
   * Initialize the filter with initial states as zero.
@@ -34,55 +34,75 @@ public:
   void init();
 
   /**
-  * Initialize the filter with a guess for initial states.
+  * Initialize the filter.
+  *
+  * @param t0 Initial time
+  * @param x0 Initial state
   */
   void init(double t0, const Eigen::VectorXd& x0);
 
   /**
-  * Update the estimated state based on measured values. The
-  * time step is assumed to remain constant.
+  * Update the estimated state based on measured values. The time step is
+  * assumed to remain constant. The control vector is assumed to be zero.
+  *
+  * @param z Measurement vector
   */
   void update(const Eigen::VectorXd& z);
 
   /**
-  * Update the estimated state based on measured values. The
-  * time step is assumed to remain constant.
+  * Update the estimated state based on measured values. The time step is
+  * assumed to remain constant.
+  *
+  * @param z Measurement vector
+  * @parma u Control vector
   */
   void update(const Eigen::VectorXd& z, const Eigen::VectorXd& u);
 
   /**
-  * Update the estimated state based on measured values,
-  * using the given time step and dynamics matrix.
+  * Update the estimated state based on measured values, using the given time
+  * step and dynamics matrix.
+  *
+  * @param z Measurement vector
+  * @param dt Time step
+  * @param A State transition matrix
   */
-  void update(const Eigen::VectorXd& z, double dt, const Eigen::MatrixXd A);
+  void update(const Eigen::VectorXd& z, const double dt, const Eigen::MatrixXd A);
 
   /**
-  * Return the current state and time.
+  * Returns the current state estimation.
+  *
+  * @return Current state estimation
   */
-  const Eigen::VectorXd& state() const { return x_hat; };
-  const double time() const { return t; };
+  const Eigen::VectorXd& state() const { return x_hat; }
+
+  /**
+   * Returns the current time.
+   *
+   * @return Current time
+   */
+  const double time() const { return t; }
 private:
-  // Matrices for computation
+  //Matrices for computation
   Eigen::MatrixXd A, B, H, Q, R, P, K, P0;
 
-  // System dimensions
+  //System dimensions
   int m, n;
 
-  // Initial and current time
+  //Initial and current time
   double t0, t;
 
-  // Discrete time step
+  //Time step
   double dt;
 
-  // Is the filter initialized?
+  //Is the filter initialized?
   bool initialized;
 
-  // n-size identity
+  //n-size identity
   Eigen::MatrixXd I;
 
-  // Estimated states
+  //Estimated states
   Eigen::VectorXd x_hat, x_hat_new;
 
-  // Control vector
+  //Control vector
   Eigen::VectorXd u;
 };
