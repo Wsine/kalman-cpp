@@ -60,6 +60,15 @@ public:
 
   /**
   * Update the estimated state based on measured values, using the given time
+  * step.
+  *
+  * @param z Measurement vector
+  * @param dt Time step
+  */
+  void update(const Eigen::VectorXd& z, const double dt);
+
+  /**
+  * Update the estimated state based on measured values, using the given time
   * step and dynamics matrix.
   *
   * @param z Measurement vector
